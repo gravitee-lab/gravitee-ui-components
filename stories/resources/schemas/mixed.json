@@ -29,7 +29,13 @@
             "EQUALS",
             "STARTS_WITH"
           ],
-          "default": "STARTS_WITH"
+          "default": "STARTS_WITH",
+          "x-schema-form": {
+            "titleMap": {
+              "EQUALS": "Equals",
+              "STARTS_WITH": "Starts with"
+            }
+          }
         },
         "path": {
           "title": "Path",

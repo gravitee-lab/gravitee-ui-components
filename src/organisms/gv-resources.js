@@ -25,8 +25,9 @@ import '../atoms/gv-switch';
 import '../atoms/gv-icon';
 import { dispatchCustomEvent } from '../lib/events';
 import { uuid } from '../lib/studio';
+import { KeyboardElement, KEYS } from '../mixins/keyboard-element';
 
-export class GvResources extends LitElement {
+export class GvResources extends KeyboardElement(LitElement) {
 
   static get properties () {
     return {
@@ -45,6 +46,18 @@ export class GvResources extends LitElement {
     this.types = [];
     this._currentResource = null;
     this._emptymessage = 'No resource';
+  }
+
+  onKeyboard () {
+    if (this.isPressed(KEYS.Esc)) {
+      this._onCancelResourceForm();
+    }
+    if (this.isPressed(KEYS.Shift, KEYS.Ctrl, KEYS.Space)) {
+      const search = this.shadowRoot.querySelector('#search-resource');
+      if (search) {
+        search.focus();
+      }
+    }
   }
 
   firstUpdated () {
@@ -233,7 +246,7 @@ export class GvResources extends LitElement {
                                 @gv-schema-form:change="${this._onChangeResourceForm}"
                                 @gv-schema-form:submit="${this._onSubmitResourceForm}">
                   <div slot="title" class="form-title">${this._currentResource.title}</div>
-                  <gv-button slot="header-left" icon="general:close" outlined small @gv-button:click="${this._onCancelResourceForm}" title="Close"></gv-button>
+                  <gv-button slot="header-left" icon="general:close" outlined small @gv-button:click="${this._onCancelResourceForm}" title="Close (esc)"></gv-button>
                   <gv-button slot="header-left" icon="home:book" ?disabled="${this.documentation != null}" outlined small @gv-button:click="${this._onFetchDocumentation}" title="Open documentation"></gv-button>
                 </gv-schema-form>`;
   }
@@ -341,7 +354,7 @@ export class GvResources extends LitElement {
                           <div class="title">
                             Manage global resources <span>(${this.resources.length})</span>
                           </div>
-                          <gv-input class="search-input" placeholder="Filter resources..." type="search" small 
+                          <gv-input id="search-resource" class="search-input" placeholder="Filter resources (Shift + Ctrl + Space)" type="search" small 
                                     @gv-input:input="${this._onSearchResource}" 
                                     @gv-input:clear="${this._onClearResource}"></gv-input>
                         </div>

@@ -300,7 +300,12 @@ export class GvSchemaForm extends LitElement {
       }
 
       if (control.enum) {
-        element.options = control.enum;
+        if (control['x-schema-form'] && control['x-schema-form'].titleMap) {
+          element.options = control.enum.map((value) => ({ value, label: control['x-schema-form'].titleMap[value] || value }));
+        }
+        else {
+          element.options = control.enum;
+        }
         if (control.type === 'array') {
           element.multiple = true;
         }
@@ -602,6 +607,7 @@ export class GvSchemaForm extends LitElement {
         .form__item:hover {
           transform: translateY(-2px);
           box-shadow: 0 10px 20px -10px #BFBFBF;
+          z-index: 600;
         }
 
         .form__item-label {
@@ -746,8 +752,15 @@ export class GvSchemaForm extends LitElement {
         }
 
         .footer {
+          display: flex;
+          justify-content:center;
           padding: 1rem;
           border-top: 1px solid #D9D9D9;
+        }
+
+        .footer .left,
+        .footer .right {
+          max-width: 400px;
         }
 
         .header .left,

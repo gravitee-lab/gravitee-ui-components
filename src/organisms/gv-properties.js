@@ -28,6 +28,7 @@ import { dispatchCustomEvent } from '../lib/events';
 import { ERROR_TYPES, parseRaw, toNameEqualsValueString } from '../lib/properties';
 import { i18n } from '../lib/i18n';
 import { classMap } from 'lit-html/directives/class-map';
+import { KeyboardElement, KEYS } from '../mixins/keyboard-element';
 
 /**
  * A component to manage properties
@@ -40,7 +41,7 @@ import { classMap } from 'lit-html/directives/class-map';
  * @attr {Array} providers - List of available providers (only http for the moment)
  * @attr {Boolean} expert - For display expert mode by default
  */
-export class GvProperties extends LitElement {
+export class GvProperties extends KeyboardElement(LitElement) {
 
   static get properties () {
     return {
@@ -74,6 +75,18 @@ export class GvProperties extends LitElement {
     this._textRows = 10;
     this._pageSizes = [5, 10, 25, 50, 100];
     this._errors = [];
+  }
+
+  onKeyboard () {
+    if (this.isPressed(KEYS.Esc)) {
+      this._onClosePropertySchemaForm();
+    }
+    if (this.isPressed(KEYS.Shift, KEYS.Ctrl, KEYS.Space)) {
+      const search = this.shadowRoot.querySelector('#search-property');
+      if (search) {
+        search.focus();
+      }
+    }
   }
 
   set properties (properties) {
@@ -430,7 +443,7 @@ export class GvProperties extends LitElement {
                       Manage global properties <span>(${this._properties ? this._properties.length : 0})</span>
                     </div>
                     <gv-switch small .description="${this.expert ? 'Expert' : 'Simple'}" .value="${this.expert}" @gv-switch:input="${this._onChangeMode}"></gv-switch>
-                    <gv-input placeholder="Filter properties..." type="search" small
+                    <gv-input id="search-property" placeholder="Filter properties (Shift + Ctrl + Space)" type="search" small
                               class="search-input"
                               .disabled="${this.expert}"
                               @gv-input:input="${this._onSearchProperty}"
@@ -459,7 +472,7 @@ export class GvProperties extends LitElement {
                   has-header
                   @gv-schema-form:submit="${this._onSubmitPropertyForm}">
                     <div slot="title" class="properties-title">Configure dynamic properties</div>
-                    <gv-button slot="header-left" icon="general:close" outlined small @gv-button:click="${this._onClosePropertySchemaForm}" title="Close"></gv-button>
+                    <gv-button slot="header-left" icon="general:close" outlined small @gv-button:click="${this._onClosePropertySchemaForm}" title="Close (esc)"></gv-button>
                     <gv-button slot="header-left" icon="home:book" ?disabled="${this._showDocumentation}" outlined small @gv-button:click="${this._fetchDocumentation}" title="Open documentation"></gv-button>
                </gv-schema-form>`;
   }
